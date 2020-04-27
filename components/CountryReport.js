@@ -1,10 +1,46 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 // import countries from '../countries.json';
 import {Context} from '../context';
+import {useLazyQuery} from 'react-apollo';
+import {Country_DATA} from './queries';
 
 const WorldReport = ({navigation}) => {
-  const {country} = React.useContext(Context);
+  const {country, countrieSelector, setCountriesSelector} = React.useContext(
+    Context,
+  );
+
+  console.log(country);
+  const [fetchData, {data}] = useLazyQuery(Country_DATA, {
+    variables: {
+      country: country.name,
+    },
+  });
+
+  useEffect(() => {
+    if (country) {
+      console.log('Data');
+      fetchData();
+    }
+  }, [country]);
+
+  const [stats, setDAta] = useState({
+    cases: 'N/A',
+    deaths: 'N/A',
+    recovered: 'N/A',
+    todayCases: 'N/A',
+    todayDeaths: 'N/A',
+    todayrecovered: 'N/A',
+  });
+  useEffect(() => {
+    if (data) {
+      console.log(data);
+      setDAta({
+        ...stats,
+        ...data.country.result,
+      });
+    }
+  }, [data]);
   return (
     <View style={styles.container}>
       <View style={[styles.row, styles.topCard]}>
@@ -17,30 +53,33 @@ const WorldReport = ({navigation}) => {
           />
           <Text style={styles.WorldReportTitle}>{country.name}</Text>
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+        <TouchableOpacity
+          onPress={() => setCountriesSelector(!countrieSelector)}>
           <Text style={styles.btntext}>Change</Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.row, styles.detailsHolder]}>
         <View style={styles.col}>
           <Text style={styles.desc}>Total Cases</Text>
-          <Text style={[styles.figure, styles.total]}>4,455</Text>
+          <Text style={[styles.figure, styles.total]}>{stats.cases}</Text>
           <Text style={[styles.small]}>
-            New: <Text style={styles.total}>{5000}</Text>
+            New: <Text style={styles.total}>{stats.todayCases}</Text>
           </Text>
         </View>
         <View style={styles.col}>
           <Text style={styles.desc}>Deaths</Text>
-          <Text style={[styles.figure, styles.deaths]}>4,455</Text>
+          <Text style={[styles.figure, styles.deaths]}>{stats.deaths}</Text>
           <Text style={[styles.small]}>
-            New: <Text style={styles.deaths}>{5000}</Text>
+            New: <Text style={styles.deaths}>{stats.todayDeaths}</Text>
           </Text>
         </View>
         <View style={styles.col}>
           <Text style={styles.desc}>Recovered</Text>
-          <Text style={[styles.figure, styles.recovered]}>4,455</Text>
+          <Text style={[styles.figure, styles.recovered]}>
+            {stats.recovered}
+          </Text>
           <Text style={[styles.small]}>
-            New: <Text style={styles.recovered}>{5000}</Text>
+            New: <Text style={styles.recovered}>{stats.todayrecovered}</Text>
           </Text>
         </View>
       </View>

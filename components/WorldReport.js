@@ -1,10 +1,27 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {useQuery} from 'react-apollo';
 import {GLOBAL_DATA} from './queries';
 
 const WorldReport = props => {
   const {data, loading} = useQuery(GLOBAL_DATA);
+  const [stats, setDAta] = useState({
+    cases: 'N/A',
+    deaths: 'N/A',
+    recovered: 'N/A',
+    todayCases: 'N/A',
+    todayDeaths: 'N/A',
+    todayrecovered: 'N/A',
+  });
+  useEffect(() => {
+    if (data) {
+      console.log(data.globalTotal);
+      setDAta({
+        ...stats,
+        ...data.globalTotal,
+      });
+    }
+  }, [data]);
   return (
     <View style={styles.container}>
       <View>
@@ -13,23 +30,25 @@ const WorldReport = props => {
       <View style={[styles.row, styles.detailsHolder]}>
         <View style={styles.col}>
           <Text style={styles.desc}>Total Cases</Text>
-          <Text style={[styles.figure, styles.total]}>4,455</Text>
+          <Text style={[styles.figure, styles.total]}>{stats.cases}</Text>
           <Text style={[styles.small]}>
-            New: <Text style={styles.total}>{5000}</Text>
+            New: <Text style={styles.total}>{stats.todayCases}</Text>
           </Text>
         </View>
         <View style={styles.col}>
           <Text style={styles.desc}>Deaths</Text>
-          <Text style={[styles.figure, styles.deaths]}>4,455</Text>
+          <Text style={[styles.figure, styles.deaths]}>{stats.deaths}</Text>
           <Text style={[styles.small]}>
-            New: <Text style={styles.deaths}>{5000}</Text>
+            New: <Text style={styles.deaths}>{stats.todayDeaths}</Text>
           </Text>
         </View>
         <View style={styles.col}>
           <Text style={styles.desc}>Recovered</Text>
-          <Text style={[styles.figure, styles.recovered]}>4,455</Text>
+          <Text style={[styles.figure, styles.recovered]}>
+            {stats.recovered}
+          </Text>
           <Text style={[styles.small]}>
-            New: <Text style={styles.recovered}>{5000}</Text>
+            New: <Text style={styles.recovered}>{stats.todayrecovered}</Text>
           </Text>
         </View>
       </View>

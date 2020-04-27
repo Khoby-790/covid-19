@@ -8,11 +8,15 @@ export default ({children}) => {
     alpha2Code: 'GH',
   });
 
+  const [countrieSelector, setCountriesSelector] = React.useState(false);
+
   return (
     <Context.Provider
       value={{
         country,
         selectCountry,
+        countrieSelector,
+        setCountriesSelector,
       }}>
       {children}
     </Context.Provider>
